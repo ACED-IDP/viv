@@ -39,9 +39,15 @@ function resolveSource(url) {
 function App() {
   const query = new URLSearchParams(window.location.search);
   const source = resolveSource(query.get('image_url'));
+  const offsets = {
+    urlOrFile: query.get('offsets_url'),
+    description: 'placeholder for *.offsets.json', 
+    isDemoImage: false
+  }
+  resolveSource();
   return (
     <ThemeProvider theme={theme}>
-      <Avivator source={source} isDemoImage={source.isDemoImage} />
+      <Avivator source={source} offsets={offsets} isDemoImage={source.isDemoImage} />
     </ThemeProvider>
   );
 }

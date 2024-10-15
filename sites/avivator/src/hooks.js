@@ -22,8 +22,10 @@ import {
 
 /** @typedef {{ urlOrFile: string | File; description: string; isDemoImage: boolean; }} ImageSource */
 
-/** @param {ImageSource} source */
-export const useImage = source => {
+/** @param {ImageSource} source
+ *  @param {ImageSource} offsets
+ */
+export const useImage = (source, offsets) => {
   const [use3d, toggleUse3d, toggleIsOffsetsSnackbarOn] = useViewerStore(
     store => [store.use3d, store.toggleUse3d, store.toggleIsOffsetsSnackbarOn],
     shallow
@@ -41,9 +43,13 @@ export const useImage = source => {
       useViewerStore.setState({ isChannelLoading: [true] });
       useViewerStore.setState({ isViewerLoading: true });
       if (use3d) toggleUse3d();
+      
       const { urlOrFile } = source;
+      const offsets_urlOrFile = offsets.urlOrFile;
+
       const newLoader = await createLoader(
         urlOrFile,
+        offsets_urlOrFile,
         toggleIsOffsetsSnackbarOn,
         message =>
           useViewerStore.setState({
@@ -78,8 +84,12 @@ export const useImage = source => {
         if (use3d) toggleUse3d();
 
         const url = new URL(window.location.href);
+
+        // write urlencoded params back to window history
         url.search =
-          typeof urlOrFile === 'string' ? `?image_url=${urlOrFile}` : '';
+          typeof urlOrFile === 'string' ? `?image_url=${encodeURIComponent(urlOrFile)}` : '';
+        url.search =  typeof offsets_urlOrFile === 'string' ? `${url.search}&offsets_url=${encodeURIComponent(offsets_urlOrFile)}` : url.search;
+
         window.history.pushState({}, '', url);
       }
     }

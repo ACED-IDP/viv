@@ -155,7 +155,7 @@ async function fetchSingleFileOmeTiffOffsets(url, offsets_url) {
   }
   if (offsets_url) {
     const res = await fetch(offsets_url);
-    return res.status === 200 ? await res.json() : undefined;  
+    return res.status === 200 ? await res.json() : undefined;
   }
   const offsetsUrl = url.replace(/ome\.tif(f?)/gi, 'offsets.json');
   const res = await fetch(offsetsUrl);
@@ -189,7 +189,10 @@ export async function createLoader(
         return source;
       }
 
-      const maybeOffsets = await fetchSingleFileOmeTiffOffsets(urlOrFile, offsets_urlOrFile);
+      const maybeOffsets = await fetchSingleFileOmeTiffOffsets(
+        urlOrFile,
+        offsets_urlOrFile
+      );
 
       // TODO(2021-05-06): temporarily disable `pool` until inline worker module is fixed.
       const source = await loadOmeTiff(urlOrFile, {

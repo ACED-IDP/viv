@@ -43,7 +43,7 @@ export const useImage = (source, offsets) => {
       useViewerStore.setState({ isChannelLoading: [true] });
       useViewerStore.setState({ isViewerLoading: true });
       if (use3d) toggleUse3d();
-      
+
       const { urlOrFile } = source;
       const offsets_urlOrFile = offsets.urlOrFile;
 
@@ -86,9 +86,13 @@ export const useImage = (source, offsets) => {
         const url = new URL(window.location.href);
 
         // write urlencoded params back to window history
+        typeof urlOrFile === 'string'
+          ? `?image_url=${encodeURIComponent(urlOrFile)}`
+          : '';
         url.search =
-          typeof urlOrFile === 'string' ? `?image_url=${encodeURIComponent(urlOrFile)}` : '';
-        url.search =  typeof offsets_urlOrFile === 'string' ? `${url.search}&offsets_url=${encodeURIComponent(offsets_urlOrFile)}` : url.search;
+          typeof offsets_urlOrFile === 'string'
+            ? `${url.search}&offsets_url=${encodeURIComponent(offsets_urlOrFile)}`
+            : url.search;
 
         window.history.pushState({}, '', url);
       }

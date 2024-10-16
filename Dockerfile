@@ -1,19 +1,23 @@
-FROM node:20-slim
+# Use an official Node.js runtime as a parent image
+FROM node:14
 
-RUN apt-get update && apt-get install -y git vim curl jq
+# Install pnpm
+RUN npm install -g pnpm
 
-WORKDIR /app
+# Set the working directory
+WORKDIR /usr/src/app
 
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable
+# Copy the package.json and pnpm-lock.yaml files
+COPY package.json pnpm-lock.yaml ./
 
-
-ADD "https://api.github.com/repos/ACED-IDP/viv/commits?per_page=1" latest_commit
-WORKDIR /app/viv
-ADD . .
-
+# Install dependencies
 RUN pnpm install
 
-EXPOSE 8000
-CMD [ "pnpm", "start" ]
+# Copy the rest of the application code
+COPY . .
+
+# Expose the port the app runs on
+EXPOSE 3000
+
+# Define the command to run the app
+CMD ["pnpm", "start"]

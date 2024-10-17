@@ -148,10 +148,14 @@ function isZodError(e) {
 }
 
 /** @param {string} url */
-async function fetchSingleFileOmeTiffOffsets(url) {
+async function fetchSingleFileOmeTiffOffsets(url, offsets_url) {
   // No offsets for multifile OME-TIFFs
   if (url.includes('companion.ome')) {
     return undefined;
+  }
+  if (offsets_url) {
+    const res = await fetch(offsets_url);
+    return res.status === 200 ? await res.json() : undefined;
   }
   const offsetsUrl = url.replace(/ome\.tif(f?)/gi, 'offsets.json');
   const res = await fetch(offsetsUrl);
@@ -167,6 +171,7 @@ async function fetchSingleFileOmeTiffOffsets(url) {
  */
 export async function createLoader(
   urlOrFile,
+  offsets_urlOrFile,
   handleOffsetsNotFound,
   handleLoaderError
 ) {
@@ -184,7 +189,10 @@ export async function createLoader(
         return source;
       }
 
-      const maybeOffsets = await fetchSingleFileOmeTiffOffsets(urlOrFile);
+      const maybeOffsets = await fetchSingleFileOmeTiffOffsets(
+        urlOrFile,
+        offsets_urlOrFile
+      );
 
       // TODO(2021-05-06): temporarily disable `pool` until inline worker module is fixed.
       const source = await loadOmeTiff(urlOrFile, {
